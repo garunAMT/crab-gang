@@ -5,7 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 
-export function Navbar() {
+import {
+  RegisterLink,
+  LoginLink,
+  LogoutLink
+} from "@kinde-oss/kinde-auth-nextjs/components"; //This is for login and signup
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { UserDropdown } from "./UserDropdown";
+
+export async function Navbar() {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
   return (
     <nav className="h-[10vh] w-full flex items-center border-b px-5 lg:px-14 justify-between">
       <Link href="/" className="flex items-center gap-x-3">
@@ -23,10 +34,19 @@ export function Navbar() {
 
       <div className="flex items-center gap-4">
         <ThemeToggle />
-        <Button variant="secondary">Sign up</Button>
-        <Button>Log in</Button>
+        {user ? (
+          <UserDropdown userImage={user.picture} />
+        ) : (
+          <div className="flex items-center gap-4">
+            <Button variant="secondary" asChild>
+              <RegisterLink>Sign up</RegisterLink>
+            </Button>
+            <Button asChild>
+              <LoginLink>Sign in</LoginLink>
+            </Button>
+          </div>
+        )}
       </div>
-      
     </nav>
   );
 }
